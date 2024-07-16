@@ -1,32 +1,100 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link,useNavigate } from "react-router-dom";
 
 function SignUp() {
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
+
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const navigate =useNavigate();
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! Status: ${res.status}`);
+      }
+
+      const data = await res.json();
+      if (data.success === false) {
+        setError(data.message);
+      } else {
+        console.log("Signup successful:", data); // Assuming the API returns some feedback
+        // Reset form and error state after successful signup
+        setFormData({
+          username: "",
+          email: "",
+          passcode: "",
+        });
+        setError(null);
+      }
+    } catch (error) {
+      console.error("Error signing up:", error);
+      setError("Error signing up. Please try again.");
+    } finally {
+      setLoading(false);
+      setError(null);
+      navigate('/sign-in');
+    }
+  };
+
   return (
     <div className="flex justify-center items-center h-screen">
       <div className="p-4 bg-gray-200 rounded-lg shadow-lg w-96">
         <h1 className="text-3xl text-center font-semibold my-7">Sign Up</h1>
-        <form className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input
             type="text"
             placeholder="Username"
             className="border p-3 rounded-lg"
             id="username"
+            value={formData.username}
+            onChange={handleChange}
           />
           <input
             type="email"
             placeholder="Email"
             className="border p-3 rounded-lg"
             id="email"
+            value={formData.email}
+            onChange={handleChange}
           />
           <input
             type="passcode"
             placeholder="Passcode"
             className="border p-3 rounded-lg"
             id="passcode"
+            value={formData.passcode}
+            onChange={handleChange}
           />
-         <button className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95
-//     disabled:opacity-80">Sign Up</button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
+          >
+            {loading ? "Loading..." : "Sign Up"}
+          </button>
+          {error && <p className="text-red-500 mt-2">{error}</p>}
         </form>
 
         <div className="flex justify-center mt-5">
