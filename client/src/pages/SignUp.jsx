@@ -39,8 +39,7 @@ function SignUp() {
       if (data.success === false) {
         setError(data.message);
       } else {
-        console.log("Signup successful:", data); // Assuming the API returns some feedback
-        // Reset form and error state after successful signup
+        console.log("Signup successful:", data); 
         setFormData({
           username: "",
           email: "",
