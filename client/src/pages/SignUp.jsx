@@ -1,5 +1,10 @@
+
+
+
+
+
 import React, { useState } from "react";
-import { Link,useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function SignUp() {
   const [formData, setFormData] = useState({
@@ -10,7 +15,7 @@ function SignUp() {
 
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const navigate =useNavigate();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
@@ -21,6 +26,13 @@ function SignUp() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validation logic
+    if (!formData.username || !formData.email || !formData.password) {
+      setError("All fields are required.");
+      return;
+    }
+    
     setLoading(true);
     try {
       const res = await fetch("/api/auth/signup", {
@@ -31,29 +43,28 @@ function SignUp() {
         body: JSON.stringify(formData),
       });
 
-      if (!res.ok) {
-        throw new Error(`HTTP error! Status: ${res.status}`);
-      }
+      // if (!res.ok) {
+      //   throw new Error(HTTP error! Status: ${res.status})
+      // }
 
       const data = await res.json();
       if (data.success === false) {
         setError(data.message);
       } else {
-        console.log("Signup successful:", data); 
+        console.log("Signup successful:", data);
         setFormData({
           username: "",
           email: "",
-          passcode: "",
+          password: "",
         });
         setError(null);
+        navigate('/sign-in');
       }
     } catch (error) {
       console.error("Error signing up:", error);
       setError("Error signing up. Please try again.");
     } finally {
       setLoading(false);
-      setError(null);
-      navigate('/sign-in');
     }
   };
 
@@ -69,6 +80,7 @@ function SignUp() {
             id="username"
             value={formData.username}
             onChange={handleChange}
+            required
           />
           <input
             type="email"
@@ -77,14 +89,16 @@ function SignUp() {
             id="email"
             value={formData.email}
             onChange={handleChange}
+            required
           />
           <input
-            type="passcode"
-            placeholder="Passcode"
+            type="password"
+            placeholder="Password"
             className="border p-3 rounded-lg"
-            id="passcode"
-            value={formData.passcode}
+            id="password"
+            value={formData.password}
             onChange={handleChange}
+            required
           />
           <button
             type="submit"
@@ -102,7 +116,9 @@ function SignUp() {
             Sign in
           </Link>
         </div>
+        
       </div>
+      {/* {error && <p className="text-red-500 mt-5">{error}</p>} */}
     </div>
   );
 }
