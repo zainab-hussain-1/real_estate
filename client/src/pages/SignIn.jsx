@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+// import { useDispatch } from "react-redux";
+import { signInFailure,signInSuccess,signInStart } from "../redux/user/userSlice";
+
 
 function SignIn() {
   const [formData, setFormData] = useState({
@@ -55,6 +58,7 @@ function SignIn() {
       setError(error.message || "Error signing in. Please try again.");
     } finally {
       setLoading(false);
+      dispatch(signInFailure(data.message))
     }
   };
 
