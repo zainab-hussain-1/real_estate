@@ -1,37 +1,22 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-// import { useDispatch } from "react-redux";
-import { signInFailure,signInSuccess,signInStart } from "../redux/user/userSlice";
-
+import { useDispatch, useSelector } from "react-redux";
+import { signInFailure, signInSuccess, signInStart } from "../redux/user/userSlice";
 
 function SignIn() {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const { loading, error } = useSelector((state) => state.user);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleChange = (e) => {
-    const { id, value } = e.target;
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [id]: value,
-    }));
+    setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    dispatch(signInStart());
 
-    // Validation logic
-    if (!formData.email || !formData.password) {
-      setError("All fields are required.");
-      return;
-    }
-
-    setLoading(true);
     try {
       const res = await fetch("/api/auth/signin", {
         method: "POST",
@@ -42,23 +27,15 @@ function SignIn() {
       });
 
       const data = await res.json();
+
       if (res.ok) {
-        console.log("Signin successful:", data);
-        setFormData({
-          email: "",
-          password: "",
-        });
-        setError(null);
-        navigate("/");
+        dispatch(signInSuccess(data));
+        navigate('/');
       } else {
-        throw new Error(data.message || "Signin failed.");
+        dispatch(signInFailure(data.message));
       }
     } catch (error) {
-      console.error("Error signing in:", error);
-      setError(error.message || "Error signing in. Please try again.");
-    } finally {
-      setLoading(false);
-      dispatch(signInFailure(data.message))
+      dispatch(signInFailure(error.message));
     }
   };
 
@@ -97,7 +74,7 @@ function SignIn() {
 
         <div className="flex justify-center mt-5">
           <p className="mr-2">Don't have an account?</p>
-          <Link to={"/sign-up"} className="text-blue-700">
+          <Link to="/sign-up" className="text-blue-700">
             Sign up
           </Link>
         </div>
