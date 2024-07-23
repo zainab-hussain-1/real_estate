@@ -42,3 +42,88 @@ export const signin = async (req, res, next) => {
     next(error); // Handle errors in your error handling middleware
   }
 };
+
+
+
+
+
+// export const google = async (req, res, next) => {
+//   try {
+//     const user = await User.findOne({ email: req.body.email });
+//     if (user) {
+//       const token = jwt.sign({ id: user._id }, "awe234#45fghhyd44");
+//       const { password: pass, ...rest } = user._doc;
+//       res
+//         .cookie('access_token', token, { httpOnly: true })
+//         .status(200)
+//         .json(rest);
+//     } else {
+//       const generatedPassword =
+//         Math.random().toString(36).slice(-8) +
+//         Math.random().toString(36).slice(-8);
+//       const hashedPassword = bcryptjs.hashSync(generatedPassword, 10);
+//       const newUser = new User({
+//         username:
+//           req.body.name.split(' ').join('').toLowerCase() +
+//           Math.random().toString(36).slice(-4),
+//         email: req.body.email,
+//         password: hashedPassword,
+//         avatar: req.body.photo,
+//       });
+//       await newUser.save();
+//       const token = jwt.sign({ id: newUser._id }, "awe234#45fghhyd44");
+//       const { password: pass, ...rest } = newUser._doc;
+//       res
+//         .cookie('access_token', token, { httpOnly: true })
+//         .status(200)
+//         .json(rest);
+//     }
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+
+
+
+
+
+
+
+export const google = async (req, res, next) => {
+  try {
+    const { email, name, photo } = req.body;
+
+    // Check if user already exists
+    let user = await User.findOne({ email });
+
+    if (user) {
+      // If user exists, generate JWT token
+      const token = jwt.sign({ id: user._id }, 'awe234#45fghhyd44');
+      const { password, ...rest } = user._doc; // Exclude password from response
+      res.cookie('access_token', token, { httpOnly: true }).status(200).json(rest);
+    } else {
+      // If user does not exist, create a new user
+      const generatedPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
+      const hashedPassword = await bcrypt.hash(generatedPassword, 10);
+
+      const username = name.split(' ').join('').toLowerCase() + Math.random().toString(36).slice(-4);
+      
+      const newUser = new User({
+        username,
+        email,
+        password: hashedPassword,
+        avatar: photo,
+      });
+
+      await newUser.save();
+
+      // Generate JWT token for new user
+      const token = jwt.sign({ id: newUser._id }, 'awe234#45fghhyd44');
+      const { password, ...rest } = newUser._doc; // Exclude password from response
+      res.cookie('access_token', token, { httpOnly: true }).status(200).json(rest);
+    }
+  } catch (error) {
+    next(error); // Pass any caught errors to the error handling middleware
+  }
+};
