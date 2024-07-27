@@ -25,28 +25,28 @@ import {
 function Profile() {
   const fileRef = useRef(null);
   const { currentUser } = useSelector((state) => state.user);
-  const [file, setFile] = useState(null); // Initialize with null
-  const [filePerc, setFilePerc] = useState(0); // Percentage of upload progress
-  const [fileUploadError, setFileUploadError] = useState(false); // Error state
+  const [file, setFile] = useState(null); 
+  const [filePerc, setFilePerc] = useState(0); 
+  const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
 
   useEffect(() => {
     if (file) {
-      handleFileUpload(file); // Pass file as argument
+      handleFileUpload(file);
     }
   }, [file]);
 
   const handleFileUpload = (file) => {
     const storage = getStorage(app);
-    const fileName = new Date().getTime() + "-" + file.name; // Create unique file name
-    const storageRef = ref(storage, fileName); // Reference for the file in storage
-    const uploadTask = uploadBytesResumable(storageRef, file); // Use file directly
+    const fileName = new Date().getTime() + "-" + file.name; 
+    const storageRef = ref(storage, fileName);
+    const uploadTask = uploadBytesResumable(storageRef, file); 
 
     uploadTask.on(
       "state_changed",
       (snapshot) => {
         const progress =
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100; // Calculate progress
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100; 
         setFilePerc(Math.round(progress));
       },
       (error) => {
@@ -56,14 +56,14 @@ function Profile() {
       () => {
         getDownloadURL(uploadTask.snapshot.ref)
           .then((downloadURL) => {
-            console.log("File available at", downloadURL); // Log the download URL
+            console.log("File available at", downloadURL); 
             setFormData((prevFormData) => ({
               ...prevFormData,
               avatar: downloadURL,
             }));
           })
           .catch((error) => {
-            console.error("Error getting download URL:", error); // Log errors in URL retrieval
+            console.error("Error getting download URL:", error); 
           });
       }
     );
