@@ -221,7 +221,7 @@ const handleSignOutUser = async () => {
           {loading ? "Loading..." : "Update"}
         </button>
         <Link className="bg-green-700 text-white p-3 rounded-lg uppercase text-center hover:opacaity-95"
-        to={"/create-listing"}>Create Listitng</Link>
+        to={"/create-listing"}>Create Listing</Link>
       </form>
       <div className="flex justify-between mt-5">
         <span
