@@ -11,6 +11,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import {Link} from 'react-router-dom'
 import { app } from "../firebase";
 import {
   getDownloadURL,
@@ -219,6 +220,8 @@ const handleSignOutUser = async () => {
         >
           {loading ? "Loading..." : "Update"}
         </button>
+        <Link className="bg-green-700 text-white p-3 rounded-lg uppercase text-center hover:opacaity-95"
+        to={"/create-listing"}>Create Listitng</Link>
       </form>
       <div className="flex justify-between mt-5">
         <span
