@@ -1,23 +1,21 @@
-
-
-
-
-
-
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
+import {useSelector} from 'react-redux'
 import { FaBath, FaBed, FaChair, FaMapMarkerAlt, FaParking, FaShare } from 'react-icons/fa';  // Corrected import statement for FaShare
 import 'swiper/css'; 
 import 'swiper/css/navigation';
+import Contact from '../components/Contact';
 
 function Listing() {
     const [listing, setListing] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
     const [copied, setCopied] = useState(false);
+    const [contact,setContact]=useState(false);
     const params = useParams();
+    const currentUser = useSelector((state)=>state.user);
 
     useEffect(() =>  {
         const fetchListing = async () => {
@@ -141,10 +139,17 @@ function Listing() {
                     {listing.furnished  ? 'Furnished':'No furnished'}
                 </li>
              </ul>
-
+             {currentUser && listing.userRef !== currentUser._id && 
+             !contact &&(
+       <button onClick={()=>setContact(true)}
+        className='bg-slate-700 text-white rounded-lg
+       uppercase hover:opacity-95 p-3'>
+        Contact landlord</button>
+             )}
+       {contact && <Contact listing={listing}/>}
                    </div>
 
-                </div>
+                  </div>
             )}
         </main>
     );
